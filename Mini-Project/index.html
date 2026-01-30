@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multi-language online Compiler</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+
+<!-- Particle Background -->
+<canvas id="particles"></canvas>
+
+<header class="navbar">
+    <h1>Multi-language online Compiler</h1>
+
+    <div class="nav-right">
+        <span class="status" id="status">● Ready</span>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</button>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="control-panel">
+        <div>
+            <label>Language</label>
+            <select id="language">
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+            </select>
+        </div>
+
+        <div class="buttons">
+            <button class="run">Run ▶</button>
+        </div>
+    </section>
+
+    <section class="workspace">
+        <div class="panel">
+            <h3>Source Code</h3>
+            <textarea id="code">// Start coding here...</textarea>
+        </div>
+
+        <div class="panel">
+            <h3>Output Console</h3>
+            <textarea id="output" readonly></textarea>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <p>Final Year Project | Web-Based Compiler Platform</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
