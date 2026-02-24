@@ -1,0 +1,21 @@
+{
+  "name": "mini-project-web-based-compiler",
+  "version": "1.0.0",
+  "description": "This is the first professional project created for submission in college. We are also going to continue working on this project in the future as well and make sure to improve it in the future as well.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Akahat23/Mini-Project-Web-based-compiler.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Akahat23/Mini-Project-Web-based-compiler/issues"
+  },
+  "homepage": "https://github.com/Akahat23/Mini-Project-Web-based-compiler#readme"
+}

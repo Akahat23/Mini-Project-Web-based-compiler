@@ -3,6 +3,13 @@ function toggleTheme() {
     const body = document.body;
     body.classList.toggle("dark");
     body.classList.toggle("light");
+
+    const isDark = body.classList.contains("dark");
+
+    // Change Monaco theme also
+    if (window.monaco) {
+        monaco.editor.setTheme(isDark ? "vs-dark" : "vs");
+    }
 }
 
 /* ===== PARTICLE BACKGROUND ===== */
@@ -63,3 +70,40 @@ function animateParticles() {
     requestAnimationFrame(animateParticles);
 }
 animateParticles();
+require.config({
+    paths: {
+        vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs'
+    }
+});
+
+require(['vs/editor/editor.main'], function () {
+
+    window.editor = monaco.editor.create(document.getElementById('editor'), {
+        value: '// Start coding here...',
+        language: 'python',
+        theme: 'vs-dark',
+        automaticLayout: true,
+        fontSize: 14,
+        minimap: { enabled: false }
+    });
+
+    // 🔥 Language Change Listener
+    document.getElementById("language").addEventListener("change", function () {
+
+        const langMap = {
+            python: "python",
+            c: "c",
+            cpp: "cpp",
+            java: "java",
+            javascript: "javascript"
+        };
+
+        const selected = this.value;
+
+        monaco.editor.setModelLanguage(
+            editor.getModel(),
+            langMap[selected]
+        );
+    });
+
+});

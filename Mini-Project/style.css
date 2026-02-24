@@ -143,6 +143,11 @@ textarea {
     color: var(--text);
     padding: 10px;
 }
+#editor {
+    height: 420px;
+    border-radius: 6px;
+    overflow: hidden;
+}
 
 /* ===== FOOTER ===== */
 footer {
