@@ -1,21 +1,26 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 import subprocess
+import os
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/")
 def home():
-    return "Backend is running!"
+    return render_template("index.html")
 
 @app.route("/run", methods=["POST"])
 def run_code():
     code = request.json.get("code")
 
-    with open("temp.py", "w") as f:
+    file_path = os.path.join(os.path.dirname(__file__), "temp.py")
+
+    with open(file_path, "w") as f:
         f.write(code)
 
     result = subprocess.run(
-        ["python", "temp.py"],
+        ["python", file_path],
         capture_output=True,
         text=True
     )
