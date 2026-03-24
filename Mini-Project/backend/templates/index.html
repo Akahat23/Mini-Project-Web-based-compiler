@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Multi-language online Compiler</title>
+    <title>Multi-Language Online Compiler</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="dark">
@@ -11,12 +11,21 @@
 <canvas id="particles"></canvas>
 
 <header class="navbar">
-    <h1>Multi-language online Compiler</h1>
 
+    <!-- 🔥 LEFT SIDE -->
+    <div class="nav-left">
+        <h1>Multi-Language Online Compiler</h1>
+        <span class="developers">
+            Developed by: Syed, Akshay, Akshat, Armaan, Ishaan
+        </span>
+    </div>
+
+    <!-- 🔥 RIGHT SIDE -->
     <div class="nav-right">
         <span class="status" id="status">● Ready</span>
         <button class="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</button>
     </div>
+
 </header>
 
 <main class="container">
@@ -29,7 +38,6 @@
                 <option value="cpp">C++</option>
                 <option value="java">Java</option>
                 <option value="python">Python</option>
-                <option value="javascript">JavaScript</option>
             </select>
         </div>
 
@@ -39,23 +47,34 @@
     </section>
 
     <section class="workspace">
+    
         <div class="panel">
             <h3>Source Code</h3>
             <div id="editor"></div>
         </div>
 
+        <!-- 🔥 INPUT PANEL -->
+        <div class="panel">
+            <h3>Input</h3>
+            <textarea id="input" placeholder="Enter input here..." rows="5"></textarea>
+        </div>
+
+        <!-- 🔥 OUTPUT PANEL -->
         <div class="panel">
             <h3>Output Console</h3>
             <textarea id="output" readonly></textarea>
         </div>
+
     </section>
 
 </main>
 
 <footer>
-    <p>Developed By-Syed , Akshay , Akshat , Armaan , Ishaan | Web-Based Compiler Platform</p>
+    <p>Developed By - Syed, Akshay, Akshat, Armaan, Ishaan | Web-Based Compiler Platform</p>
 </footer>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>
