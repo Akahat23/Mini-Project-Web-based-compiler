@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Syntaxia</title>
+    <meta name="description" content="Dashboard and Quick Start for Syntaxia IDE">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark dashboard-body" id="body">
+
+<!-- Animated Background Canvas -->
+<canvas id="particles"></canvas>
+<div class="bg-glow"></div>
+
+<!-- Navbar -->
+<header class="navbar" id="navbar">
+    <div class="nav-brand">
+        <div class="logo-icon" onclick="window.location.href='/'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+        </div>
+        <div class="brand-text">
+            <span class="brand-name">Syntaxia</span>
+            <span class="brand-sub">Dashboard</span>
+        </div>
+    </div>
+
+    <div class="nav-center"></div>
+
+    <div class="nav-actions">
+        <!-- New Auth Widget -->
+        <div class="user-profile-widget" id="userProfileWidget" onclick="toggleProfileMenu()" style="display:none">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span class="username-text" id="usernameText">name</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5; margin-left:4px;">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </div>
+        
+        <!-- Old login icon, shown if not logged in -->
+        <button class="run-btn" id="loginBtn" onclick="openLoginModal()" style="padding: 6px 14px; font-size: 13px;">
+            Sign In
+        </button>
+
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme" id="themeBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+</header>
+
+<!-- Profile Dropdown Menu -->
+<div class="profile-dropdown" id="profileDropdown" style="display:none">
+    <a href="/compiler" class="dropdown-item">
+        <span class="dropdown-icon">💻</span> Open Compiler
+    </a>
+    <div class="dropdown-sep"></div>
+    <button class="dropdown-item text-error" onclick="logout()">
+        <span class="dropdown-icon">🚪</span> Logout
+    </button>
+</div>
+
+<!-- Main Dashboard Layout -->
+<main class="dashboard-container" id="dashboardContainer">
+    <section class="hero-section">
+        <h1 id="welcomeTitle">Welcome to Syntaxia</h1>
+        <p class="hero-subtitle">Your blazing-fast, cloud-based development environment.</p>
+    </section>
+
+    <section class="quick-actions">
+        <h2 class="section-title">Quick Start</h2>
+        <div class="action-grid">
+            <a href="/compiler?mode=single&lang=python" class="action-card">
+                <div class="action-icon">🐍</div>
+                <div class="action-text">
+                    <h3>Python Script</h3>
+                    <p>Fast single-file task</p>
+                </div>
+            </a>
+            <a href="/compiler?mode=multi&lang=cpp" class="action-card">
+                <div class="action-icon">🔷</div>
+                <div class="action-text">
+                    <h3>C++ Project</h3>
+                    <p>Multi-file program</p>
+                </div>
+            </a>
+            <a href="/compiler?mode=single&lang=c" class="action-card">
+                <div class="action-icon">🔵</div>
+                <div class="action-text">
+                    <h3>C Program</h3>
+                    <p>Systems programming</p>
+                </div>
+            </a>
+            <a href="/compiler?mode=multi&lang=java" class="action-card">
+                <div class="action-icon">☕</div>
+                <div class="action-text">
+                    <h3>Java App</h3>
+                    <p>Object-oriented project</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+
+    <!-- Interactive Elements Section -->
+    <section class="interactive-modules">
+        <div class="stats-row">
+            <div class="stat-card" onmousemove="tilt(event, this)" onmouseleave="resetTilt(this)">
+                <div class="stat-num" data-target="15234">0</div>
+                <div class="stat-label">Lines Compiled</div>
+            </div>
+            <div class="stat-card" onmousemove="tilt(event, this)" onmouseleave="resetTilt(this)">
+                <div class="stat-num" data-target="98">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card" onmousemove="tilt(event, this)" onmouseleave="resetTilt(this)">
+                <div class="stat-num">Python</div>
+                <div class="stat-label">Top Language</div>
+            </div>
+        </div>
+        
+        <div class="tip-card" onclick="nextTip()" onmousemove="tilt(event, this)" onmouseleave="resetTilt(this)" title="Click for another tip!">
+            <div class="tip-header">💡 Tip of the Day</div>
+            <div class="tip-content" id="tipContent">Use the Ctrl+K shortcut in the editor to summon the Command Palette instantly!</div>
+        </div>
+    </section>
+
+    <section class="history-section" id="historySection" style="display:none">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 class="section-title" style="margin: 0;">Recent Activity</h2>
+            <a href="/compiler" class="mini-btn">Open Compiler →</a>
+        </div>
+        <div class="history-grid" id="dashboardHistoryList">
+            <!-- Populated dynamically via JS -->
+            <p class="text-muted">Loading your recent code executions...</p>
+        </div>
+    </section>
+</main>
+
+
+<!-- Code Viewer Modal -->
+<div class="code-viewer-overlay" id="codeViewerOverlay" style="display:none;">
+    <div class="code-viewer-modal">
+        <div class="code-viewer-header">
+            <h3>Code Snapshot</h3>
+            <div class="code-viewer-actions">
+                <button class="mini-btn" onclick="copyCodeViewerContent()">Copy</button>
+                <button class="mini-btn" onclick="closeCodeViewer()">Close</button>
+            </div>
+        </div>
+        <div class="code-viewer-content">
+            <pre><code id="codeViewerBody"></code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- Login / Register Modal -->
+<div class="auth-overlay" id="authOverlay" style="display:none;">
+    <div class="auth-card">
+        <h2 id="authTitle">Sign In</h2>
+        <p id="authMessage" class="auth-message"></p>
+        <input id="authUsername" placeholder="Email or Username" autocomplete="username" spellcheck="false" />
+        <input id="authEmail" type="email" placeholder="Email Address" autocomplete="email" spellcheck="false" style="display:none;" />
+        <input id="authFullName" type="text" placeholder="Full Name" autocomplete="name" spellcheck="false" style="display:none;" />
+        <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" spellcheck="false" />
+        <div class="auth-actions">
+            <button class="mini-btn" id="authSwitchBtn" onclick="switchAuthMode()">Need an account?</button>
+            <button class="run-btn" id="authSubmitBtn" onclick="submitAuth()">Login</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='home.js') }}"></script>
+</body>
+</html>

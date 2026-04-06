@@ -2,79 +2,403 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Multi-Language Online Compiler</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntaxia — Multi-Language Online IDE</title>
+    <meta name="description" content="A powerful web-based interactive compiler supporting Python, C, C++, and Java. Write, run, and interact with programs directly in your browser.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="dark">
+<body class="dark" id="body">
 
-<!-- Particle Background -->
+<!-- Animated Background Canvas -->
 <canvas id="particles"></canvas>
+<div class="bg-glow"></div>
 
-<header class="navbar">
+<!-- Mode Selection Modal -->
+<div class="mode-overlay" id="modeOverlay" style="display:none;">
+    <div class="mode-modal">
+        <div class="mode-modal-brand">
+            <div class="logo-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+            </div>
+            <span class="brand-name">Syntaxia</span>
+        </div>
+        <h2 class="mode-modal-title">Choose Your Workspace</h2>
+        <p class="mode-modal-sub">Select the setup that matches your coding task</p>
 
-    <!-- 🔥 LEFT SIDE -->
-    <div class="nav-left">
-        <h1>Multi-Language Online Compiler</h1>
-        <span class="developers">
-            Developed by: Syed, Akshay, Akshat, Armaan, Ishaan
-        </span>
+        <div class="mode-cards">
+            <button class="mode-card" id="modeCardSingle" onclick="setMode('single')">
+                <div class="mode-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                </div>
+                <div class="mode-card-content">
+                    <h3>Single File</h3>
+                    <p>Write and run a single source file. Perfect for algorithms, exercises, and quick programs.</p>
+                    <ul class="mode-features">
+                        <li>✓ Fast setup</li>
+                        <li>✓ Interactive terminal</li>
+                        <li>✓ Live stdin/stdout</li>
+                    </ul>
+                </div>
+                <div class="mode-card-arrow">→</div>
+            </button>
+
+            <button class="mode-card mode-card-highlight" id="modeCardMulti" onclick="setMode('multi')">
+                <div class="mode-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        <line x1="12" y1="11" x2="12" y2="17"></line>
+                        <line x1="9" y1="14" x2="15" y2="14"></line>
+                    </svg>
+                </div>
+                <div class="mode-card-content">
+                    <h3>Multi-File Project</h3>
+                    <p>Work with multiple source files, headers, and modules. Ideal for complex programs.</p>
+                    <ul class="mode-features">
+                        <li>✓ Multiple file tabs</li>
+                        <li>✓ Headers &amp; modules</li>
+                        <li>✓ Full project compilation</li>
+                    </ul>
+                </div>
+                <div class="mode-badge-new">PRO</div>
+                <div class="mode-card-arrow">→</div>
+            </button>
+        </div>
+
+        <p class="mode-switch-hint">You can switch modes anytime using the toolbar</p>
+    </div>
+</div>
+
+<!-- Navbar -->
+<header class="navbar" id="navbar">
+    <div class="nav-brand">
+        <div class="logo-icon" onclick="window.location.href='/'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+        </div>
+        <div class="brand-text">
+            <span class="brand-name">Syntaxia</span>
+            <span class="brand-sub">Online IDE</span>
+        </div>
     </div>
 
-    <!-- 🔥 RIGHT SIDE -->
-    <div class="nav-right">
-        <span class="status" id="status">● Ready</span>
-        <button class="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</button>
+    <div class="nav-center">
+        <div class="lang-pills" id="langPills">
+            <button class="lang-pill active" data-lang="c" onclick="selectLanguage('c', this)">C</button>
+            <button class="lang-pill" data-lang="cpp" onclick="selectLanguage('cpp', this)">C++</button>
+            <button class="lang-pill" data-lang="java" onclick="selectLanguage('java', this)">Java</button>
+            <button class="lang-pill" data-lang="python" onclick="selectLanguage('python', this)">Python</button>
+        </div>
     </div>
 
+    <div class="nav-actions">
+                <button class="icon-btn" onclick="window.location.href='/'" title="Dashboard / Home">
+            🏠
+        </button>
+        <div class="nav-divider"></div>
+        
+        <button class="mode-toggle-btn" id="modeToggleBtn" onclick="openModeModal()" title="Switch workspace mode">
+            <span class="mode-toggle-icon" id="modeToggleIcon"></span>
+            <span id="modeToggleLabel">Single File</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:0.5">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </button>
+
+        <div class="nav-divider"></div>
+
+        <button class="icon-btn" id="historyBtn" onclick="toggleHistoryModal()" title="History">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v5h5"></path>
+                <path d="M21 21v-5h-5"></path>
+                <path d="M21 3L3 21"></path>
+            </svg>
+        </button>
+        
+        <div class="user-profile-widget" id="userProfileWidget" onclick="toggleProfileMenu()" style="display:none">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span class="username-text" id="usernameText">name</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5; margin-left:4px;">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </div>
+        
+        <button class="run-btn" id="loginBtn" onclick="openLoginModal()" style="padding: 6px 14px; font-size: 13px;">
+            Sign In
+        </button>
+
+        <div class="status-badge error" id="statusBadge">
+            <span class="status-dot"></span>
+            <span id="statusText">Connecting...</span>
+        </div>
+        <button class="icon-btn" onclick="clearAll()" title="Clear All">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14H6L5 6"></path>
+                <path d="M10 11v6M14 11v6"></path>
+            </svg>
+        </button>
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme" id="themeBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+        <button class="run-btn" id="runBtn" onclick="runCode()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" id="runBtnIcon">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="runBtnLabel">Run</span>
+        </button>
+    </div>
 </header>
 
-<main class="container">
+<!-- Profile Dropdown Menu -->
+<div class="profile-dropdown" id="profileDropdown" style="display:none">
+    <a href="/" class="dropdown-item">
+        <span class="dropdown-icon">🏠</span> Back to Dashboard
+    </a>
+    <button class="dropdown-item" onclick="openProfileModal()">
+        <span class="dropdown-icon">✏️</span> Edit Profile
+    </button>
+    <div class="dropdown-sep"></div>
+    <button class="dropdown-item text-error" onclick="logout()">
+        <span class="dropdown-icon">🚪</span> Logout
+    </button>
+</div>
 
-    <section class="control-panel">
-        <div>
-            <label>Language</label>
-            <select id="language">
-                <option value="c">C</option>
-                <option value="cpp">C++</option>
-                <option value="java">Java</option>
-                <option value="python">Python</option>
-            </select>
+<!-- Main Layout -->
+
+<main class="app-container" id="appContainer">
+
+    <!-- Left: Editor Panel -->
+    <section class="editor-section" id="editorSection">
+
+        <!-- File Tabs (Multi-file mode only) -->
+        <div class="file-tabs-bar" id="fileTabsBar" style="display:none;">
+            <div class="file-tabs-scroll" id="fileTabsScroll"></div>
+            <button class="add-file-btn" id="addFileBtn" onclick="addNewFile()" title="Add new file">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New File
+            </button>
         </div>
 
-        <div class="buttons">
-            <button type="button" class="run">Run ▶</button>
+        <!-- Editor Panel Header -->
+        <div class="panel-header">
+            <div class="panel-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                <span id="editorPanelTitle">Source Code</span>
+                <span class="lang-badge" id="langBadge">C</span>
+            </div>
+            <div class="panel-actions">
+                <button class="mini-btn" onclick="downloadFile()" title="Download Source File">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download
+                </button>
+                <button class="mini-btn" onclick="copyCode()" title="Copy Code">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy
+                </button>
+                <button class="mini-btn" onclick="resetCode()" title="Reset to Template" id="resetBtn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="1 4 1 10 7 10"></polyline>
+                        <path d="M3.51 15a9 9 0 1 0 .49-3.5"></path>
+                    </svg>
+                    Reset
+                </button>
+            </div>
         </div>
+
+        <div id="editor" class="monaco-editor-container"></div>
     </section>
 
-    <section class="workspace">
-    
-        <div class="panel">
-            <h3>Source Code</h3>
-            <div id="editor"></div>
-        </div>
+    <!-- Right: Interactive Terminal -->
+    <aside class="io-section" id="ioSection">
+        <div class="terminal-panel" id="terminalPanel">
 
-        <!-- 🔥 INPUT PANEL -->
-        <div class="panel">
-            <h3>Input</h3>
-            <textarea id="input" placeholder="Enter input here..." rows="5"></textarea>
-        </div>
+            <!-- Terminal Header -->
+            <div class="panel-header">
+                <div class="panel-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                    <span>Terminal</span>
+                    <span class="exec-time" id="execTime"></span>
+                </div>
+                <div class="panel-actions">
+                    <button class="mini-btn stop-btn" id="stopBtn" onclick="stopRun()" style="display:none">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                        </svg>
+                        Stop
+                    </button>
+                    <button class="mini-btn" onclick="clearTerminal()">Clear</button>
+                </div>
+            </div>
 
-        <!-- 🔥 OUTPUT PANEL -->
-        <div class="panel">
-            <h3>Output Console</h3>
-            <textarea id="output" readonly></textarea>
-        </div>
+            <!-- Terminal Output Area -->
+            <div class="terminal-output" id="terminalOutput">
+                <div class="terminal-placeholder" id="terminalPlaceholder">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.25">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                    <p>Run your code to see output here</p>
+                    <p class="terminal-hint">💡 Type input directly in the bar below when prompted</p>
+                </div>
+            </div>
 
-    </section>
+            <!-- Terminal Input Bar (shown when process is running) -->
+            <div class="terminal-input-bar" id="terminalInputBar">
+                <span class="terminal-prompt">$</span>
+                <input
+                    type="text"
+                    id="terminalInput"
+                    class="terminal-input-field"
+                    placeholder="Type input and press Enter..."
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <button class="terminal-send-btn" onclick="sendTerminalInput()" title="Send (Enter)">↵</button>
+            </div>
+        </div>
+    </aside>
 
 </main>
 
-<footer>
-    <p>Developed By - Syed, Akshay, Akshat, Armaan, Ishaan | Web-Based Compiler Platform</p>
+<!-- Rename File Modal -->
+<div class="rename-overlay" id="renameOverlay" style="display:none;">
+    <div class="rename-modal">
+        <h3>Rename File</h3>
+        <input type="text" id="renameInput" class="rename-input" placeholder="filename.c" spellcheck="false" />
+        <div class="rename-actions">
+            <button class="mini-btn" onclick="cancelRename()">Cancel</button>
+            <button class="run-btn" onclick="confirmRename()" style="padding:7px 16px; font-size:13px;">Rename</button>
+        </div>
+    </div>
+</div>
+
+<!-- Code Viewer Modal -->
+<div class="code-viewer-overlay" id="codeViewerOverlay" style="display:none;">
+    <div class="code-viewer-modal">
+        <div class="code-viewer-header">
+            <h3>Code Snapshot</h3>
+            <div class="code-viewer-actions">
+                <button class="mini-btn" onclick="copyCodeViewerContent()">Copy</button>
+                <button class="mini-btn" onclick="closeCodeViewer()">Close</button>
+            </div>
+        </div>
+        <div class="code-viewer-content">
+            <pre><code id="codeViewerBody"></code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- Login / Register Modal -->
+<div class="auth-overlay" id="authOverlay" style="display:none;">
+    <div class="auth-card">
+        <h2 id="authTitle">Sign In</h2>
+        <p id="authMessage" class="auth-message"></p>
+        <input id="authUsername" placeholder="Username" autocomplete="username" spellcheck="false" />
+        <input id="authEmail" type="email" placeholder="Email Address" autocomplete="email" spellcheck="false" style="display:none;" />
+        <input id="authFullName" type="text" placeholder="Full Name" autocomplete="name" spellcheck="false" style="display:none;" />
+        <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" spellcheck="false" />
+        <div class="auth-actions">
+            <button class="mini-btn" id="authSwitchBtn" onclick="switchAuthMode()">Need an account?</button>
+            <button class="run-btn" id="authSubmitBtn" onclick="submitAuth()">Login</button>
+        </div>
+    </div>
+</div>
+
+<!-- History Modal -->
+<div class="history-overlay" id="historyOverlay" style="display:none;">
+    <div class="history-card">
+        <div class="history-header">
+            <h2>Code History</h2>
+            <button class="mini-btn" onclick="toggleHistoryModal()">Close</button>
+        </div>
+        <div id="historyList" class="history-list">Loading...</div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+        <div class="spinner-wrap">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring-inner"></div>
+        </div>
+        <p class="loading-text">Compiling<span class="dots"></span></p>
+        <p class="loading-sub" id="loadingLang">Preparing your code</p>
+    </div>
+</div>
+
+<!-- Command Palette (Ctrl+K) -->
+<div class="palette-overlay" id="paletteOverlay" style="display:none;">
+    <div class="palette-modal">
+        <div class="palette-search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="paletteInput" placeholder="Type a command or search..." autocomplete="off">
+            <span class="palette-shortcut">ESC</span>
+        </div>
+        <div class="palette-results" id="paletteResults">
+            <!-- Populated via JS -->
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Profile Modal -->
+<div class="auth-overlay" id="profileOverlay" style="display:none;">
+    <div class="auth-card">
+        <h2 id="profileTitle">Edit Profile</h2>
+        <p id="profileMessage" class="auth-message"></p>
+        <input id="profileUsername" placeholder="New Username" autocomplete="off" spellcheck="false" />
+        <div class="auth-actions" style="justify-content: flex-end; margin-top: 15px;">
+            <button class="mini-btn" onclick="closeProfileModal()" style="margin-right: 10px;">Cancel</button>
+            <button class="run-btn" onclick="updateUsername()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- Footer -->
+<footer class="app-footer">
+    <span>Developed by <strong>Syed, Akshay, Akshat, Armaan, Ishaan</strong></span>
+    <span class="footer-sep">·</span>
+    <span>Web-Based Compiler Platform</span>
 </footer>
 
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-
 </body>
 </html>
