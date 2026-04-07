@@ -166,10 +166,10 @@
     <div class="auth-card">
         <h2 id="authTitle">Sign In</h2>
         <p id="authMessage" class="auth-message"></p>
-        <input id="authUsername" placeholder="Email or Username" autocomplete="username" spellcheck="false" />
-        <input id="authEmail" type="email" placeholder="Email Address" autocomplete="email" spellcheck="false" style="display:none;" />
-        <input id="authFullName" type="text" placeholder="Full Name" autocomplete="name" spellcheck="false" style="display:none;" />
-        <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" spellcheck="false" />
+        <input id="authUsername" placeholder="Email or Username" aria-label="Email or Username" autocomplete="username" spellcheck="false" />
+        <input id="authEmail" type="email" placeholder="Email Address" aria-label="Email Address" autocomplete="email" spellcheck="false" style="display:none;" />
+        <input id="authFullName" type="text" placeholder="Full Name" aria-label="Full Name" autocomplete="name" spellcheck="false" style="display:none;" />
+        <input id="authPassword" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" spellcheck="false" />
         <div class="auth-actions">
             <button class="mini-btn" id="authSwitchBtn" onclick="switchAuthMode()">Need an account?</button>
             <button class="run-btn" id="authSubmitBtn" onclick="submitAuth()">Login</button>

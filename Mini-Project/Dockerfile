@@ -9,7 +9,7 @@ RUN apt-get update && \
     default-jdk \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Setup working directory
 WORKDIR /app
 
 # Copy the requirements file and install dependencies
@@ -26,7 +26,6 @@ RUN mkdir -p /app/backend/data /app/backend/temp
 # Set the working directory to the backend so server.py can run properly
 WORKDIR /app/backend
 
-# Expose port 5000
 EXPOSE 5000
 
 # Run the application with Gunicorn, using threading (since async_mode='threading')
