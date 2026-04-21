@@ -45,6 +45,21 @@ def get_python_cmd():
     _py_cmd = "py"
     return "py"
 
+# ─── GCC/G++ resolver (prefers modern WinLibs over old MinGW in PATH) ─────────
+_WINLIBS_BIN = os.path.join(
+    os.environ.get("LOCALAPPDATA", ""),
+    "Microsoft", "WinGet", "Packages",
+    "BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe",
+    "mingw64", "bin"
+)
+
+def _resolve_compiler(name):
+    """Return full path to compiler, preferring WinLibs GCC 15 on Windows."""
+    candidate = os.path.join(_WINLIBS_BIN, name + ".exe")
+    if sys.platform == "win32" and os.path.isfile(candidate):
+        return candidate
+    return name  # fall back to PATH
+
 # ─── Popen helper ─────────────────────────────────────────────────────────────
 def _popen(cmd, cwd):
     kwargs = dict(
@@ -155,7 +170,7 @@ def _execute(sid, data, sandbox, run_id):
             ]
             _emit_sys(sid, "⚙ Compiling C...\n")
             cr = subprocess.run(
-                ["gcc", main_file] + extra_srcs + ["-o", exe_path, "-std=c17", "-O2", "-Wall", "-lm", "-lpthread"],
+                [_resolve_compiler("gcc"), main_file] + extra_srcs + ["-o", exe_path, "-std=c17", "-O2", "-Wall", "-lm", "-lpthread"],
                 capture_output=True, text=True, timeout=COMPILE_TIMEOUT, cwd=sandbox
             )
             if cr.returncode != 0:
@@ -181,7 +196,7 @@ def _execute(sid, data, sandbox, run_id):
             ]
             _emit_sys(sid, "⚙ Compiling C++...\n")
             cr = subprocess.run(
-                ["g++", main_file] + extra_srcs + ["-o", exe_path, "-std=c++20", "-O2", "-Wall", "-lm", "-lpthread"],
+                [_resolve_compiler("g++"), main_file] + extra_srcs + ["-o", exe_path, "-std=c++14", "-O2", "-Wall", "-lm", "-lpthread"],
                 capture_output=True, text=True, timeout=COMPILE_TIMEOUT, cwd=sandbox
             )
             if cr.returncode != 0:
